@@ -51,7 +51,7 @@ def default_setup_args(*, version):
         name=name,
         version=version,
         author="AutoGluon Community",
-        url="https://github.com/autogluon/autogluon-cloud",
+        url="https://github.com/autogluon/autogluon-fair",
         description="Train and deploy AutoGluon backed models on the cloud",
         long_description=long_description,
         long_description_content_type="text/markdown",
@@ -104,12 +104,13 @@ def default_setup_args(*, version):
 
 version = "0.1"
 version = update_version(version, use_file_if_exists=False, create_file=True)
+AUTOGLUON_VERSION_RANGE = ">=0.6,<1.0"
 
 install_requires = [
-    "autogluon.common>=0.6",
-    f'autogluon.core>=0.6',
-    f'autogluon.tabular>=0.6',
-    f'autogluon.features>=0.6',
+    f'{AUTOGLUON}.common{AUTOGLUON_VERSION_RANGE}',
+    f'{AUTOGLUON}.core{AUTOGLUON_VERSION_RANGE}',
+    f'{AUTOGLUON}.tabular{AUTOGLUON_VERSION_RANGE}',
+    f'{AUTOGLUON}.features{AUTOGLUON_VERSION_RANGE}',
     "numpy>=1.21.4,<2.0",
     "pandas>=1.2.5,<2.0",
     "scipy"
