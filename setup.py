@@ -52,7 +52,7 @@ def default_setup_args(*, version):
         version=version,
         author="AutoGluon Community",
         url="https://github.com/autogluon/autogluon-fair",
-        description="Train and deploy AutoGluon backed models on the cloud",
+        description="AutoML Framework for evaluating ML model fairness metrics",
         long_description=long_description,
         long_description_content_type="text/markdown",
         license="Apache-2.0",
