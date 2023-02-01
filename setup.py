@@ -113,7 +113,6 @@ install_requires = [
     f'{AUTOGLUON}.features{AUTOGLUON_VERSION_RANGE}',
     "numpy>=1.21.4,<2.0",
     "pandas>=1.2.5,<2.0",
-    "scipy"
 ]
 
 extras_require = dict()
