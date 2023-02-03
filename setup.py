@@ -109,7 +109,7 @@ AUTOGLUON_VERSION_RANGE = ">=0.6,<1.0"
 install_requires = [
     f'{AUTOGLUON}.common{AUTOGLUON_VERSION_RANGE}',
     f'{AUTOGLUON}.core{AUTOGLUON_VERSION_RANGE}',
-    f'{AUTOGLUON}.tabular{AUTOGLUON_VERSION_RANGE}',
+    f'{AUTOGLUON}.tabular[all]{AUTOGLUON_VERSION_RANGE}',
     f'{AUTOGLUON}.features{AUTOGLUON_VERSION_RANGE}',
     "numpy>=1.21.4,<2.0",
     "pandas>=1.2.5,<2.0",
