@@ -1,29 +1,16 @@
-# Overview
-FairPredictor is a postprocessing approach for enforcing fairness, with support for a wide range of performance metrics and fairness criteria, and support for inferred attributes, i.e. it does not require access to protected attributes at test time. 
-Under the hood, FairPredictor works by adjusting the decision boundary for each group individually. Where groups are not available, it makes use of inferred group membership to adjust decision boundaries.
+# Fairness for AutoML
 
-The key idea underlying this toolkit is that for a wide range of use cases, the most suitable classifier should do more than maximize some form of accuracy.
-We offer a general toolkit that allows different measures to be optimized and additional constraints to be imposed by tuning the behavior of a binary predictor on validation data.
+Autogluon.fair provides additional tools to enforce a wide-range of fairness definitions and to customize binary classifier behavior.  
 
-For example, classifiers can be tuned to maximize performance for a wide range of metrics such as:
+## Instructions
 
-* Accuracy
-* Balanced Accuracy
-* F1 score
-* MCC
-* Custom utility functions
+ 1. Install autogluon (see <https://auto.gluon.ai/stable/index.html#installation>)
+ 2. Download the source of autogluon.fair and in the source directory run:
+    python3 -m pip install -e .
 
-While also approximately satisfying a wide range of group constraints such as:
+Now run the [Example Notebook](https://github.com/autogluon/autogluon-fair/blob/master/examples/quickstart_fair.ipynb) or try some of the example below.
 
-* Demographic Parity (The idea that positive decisions should occur at the same rates for all protected groups, for example for men at the same rate as for women)
-* Equal Opportunity (The recall should be the same for all protected groups)
-* Minimum recall constraints (The recall should be above a particular level for all groups)
-* Minimum Precision constraints (The precision should be above a particular level for all groups)
-* Custom Fairness Metrics
-
-The full set of constraints and objectives can be seen in the list of measures at the bottom of the document. 
-
-## Example usage
+### Example usage
 
     # Load and train a baseline classifier
 
@@ -87,40 +74,70 @@ The full set of constraints and objectives can be seen in the list of measures a
 | ('updated', ' Male')               |  0.830864  |          0.74397    | 0.652284   | 0.579829  |   0.866049  | 0.523155  | 0.91321   |             1965 |             4515 |              0.303241 |                 0.183179   |
 | ('updated', 'Maximum difference')  |  0.0684973 |          0.133616   | 0.00781595 | 0.0343327 |   0.347018  | 0.326703  | 0.0360405 |             1612 |             1579 |              0.195913 |                 0.00744171 |
 
-## Why Another Fairness Library?
+## Overview
+
+Autogluon.fair is a postprocessing approach for enforcing fairness, with support for a wide range of performance metrics and fairness criteria, and support for inferred attributes, i.e. it does not require access to protected attributes at test time. 
+Under the hood, FairPredictor works by adjusting the decision boundary for each group individually. Where groups are not available, it makes use of inferred group membership to adjust decision boundaries.
+
+The key idea underlying this toolkit is that for a wide range of use cases, the most suitable classifier should do more than maximize some form of accuracy.
+We offer a general toolkit that allows different measures to be optimized and additional constraints to be imposed by tuning the behavior of a binary predictor on validation data.
+
+For example, classifiers can be tuned to maximize performance for a wide range of metrics such as:
+
+* Accuracy
+* Balanced Accuracy
+* F1 score
+* MCC
+* Custom utility functions
+
+While also approximately satisfying a wide range of group constraints such as:
+
+* Demographic Parity (The idea that positive decisions should occur at the same rates for all protected groups, for example for men at the same rate as for women)
+* Equal Opportunity (The recall should be the same for all protected groups)
+* Minimum Recall Constraints (The recall should be above a particular level for all groups)
+* Minimum Precision Constraints (The precision should be above a particular level for all groups)
+* Custom Fairness Metrics
+
+The full set of constraints and objectives can be seen in the list of measures at the bottom of the document.
+
+### Why Another Fairness Library?
 
 Fundamentally, most existing fairness methods are not appropriate for ensemble methods like AutoGluon.
 Under the hood, autogluon makes use of many different types of classifiers trained on random subsets of the data, and it's inherent complexity makes fairness methods that iteratively retrain classifiers punitively slow. The use of random subsets makes AutoGluon robust to small amounts of mislabeled data, but also means that methods that iteratively make small changes to the training data to enforce fairness can have unpredictable behavior. At same time, the many different types of sub-classifiers used mean that any method inprocessing method that requires the alteration of every method used to train a sub-classifier is not feasible.
 
 That said, we make several design decisions which we believe make for a better experience for data scientists:
 
-### Fine-grained control of behavior
+#### Fine-grained control of behavior
 
-#### Wide Choice of performance measure
+##### Wide Choice of performance measure
 
-Unlike other approaches to fairness, FairPredictor allows the optimization of arbitrary performance measures such as F1 or MCC, subject to fairness constraints. This can substantially decrease the fairness/performance trade-off with, for example, F1 scores being 3-4% higher when directly optimized for rather than accuracy.
+Unlike other approaches to fairness, FairPredictor allows the optimization of arbitrary performance measures such as F1 or MCC, subject to fairness constraints. This can substantially improve the fairness/performance trade-off with, for example, F1 scores being 3-4% higher when directly optimized for rather than accuracy.
 
-#### Wide Choice of Fairness Measures
+##### Wide Choice of Fairness Measures
 
 Rather than offering a range of different fairness methods that enforce a small number of fairness definitions through a variety of different methods, we offer one method that can enforce a much wider range of fairness definitions out of the box, alongside support for custom fairness definitions.
 
 Of the set of metrics discussed in [Verma and Rubin](https://fairware.cs.umass.edu/papers/Verma.pdf), and the metrics measured by [Sagemaker Clarify](https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-measure-post-training-bias.html), out of the box FairPredictor offers the ability to both measure and enforce 7 of the 8 metrics used to evaluate classifier decision measured in Verma and Rubin, and 11 of the 13 measures used in Clarify.
 
-#### Direct Remedy of Harms
+##### Direct Remedy of Harms
 
-Many fairness measures can be understood as identifying a harm, and then equalizing this harm across the population as a whole. For example, the use demographic parity of identifies people as being harmed by a low selection rate, which is then set to be the same for all groups, while equal opportunity identifies people as being harmed by low recall.
+See summary [article](https://www.wired.com/story/bias-statistics-artificial-intelligence-healthcare/) on the problems this addresses. More details are in the [paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4331652).
+
+An Ipython notebook generating many of the figures in the paper can be found here: [Levelling up notebook](https://github.com/autogluon/autogluon-fair/blob/master/examples/levelling_up.ipynb)
+
+Many fairness measures can be understood as identifying a harm, and then equalizing this harm across the population as a whole. For example, the use demographic parity of identifies people as being harmed by a low selection rate, which is then set to be the same for all groups, while equal opportunity identifies people as being harmed by low recall, and balances this harm across all groups. However, these fairness formulations often explicitly  
 
 As an alternative to equalizing the harm across the population, we allow data scientists to specify minimum rates of e.g., recall, precision, or selection rate for every group, with one line of code. E.g. 
 
     fpredictor.fit(gm.accuracy, gm.precision.min, 0.5)
 
- force the found classifier to have a precision of at least 0.5 for every group.
+ finds a classifier that maximizes accuracy while having a precision of at least 0.5 for every group.
 
 These constraints have wider uses outside of fairness. For example, a classifier can be trained to identify common defects across multiple factory lines, and its behavior can be altered to enforce a recall of 90% of all defects for each line (at a cost of increased false positives).
 
     fpredictor.fit(gm.accuracy, gm.recall.min, 0.9)
 
-#### Support for Utility based approaches
+##### Support for Utility based approaches
 
 We provide support for the utility based approach set out in [Fairness On The Ground: Applying Algorithmic Fairness Approaches To Production Systems](https://arxiv.org/pdf/2103.06172.pdf), whereby different thresholds can be selected per group to optimize a utility-based objective.
 
@@ -140,7 +157,7 @@ optimizes the utility, while
 
 optimizes the utility subject to the requirement that the classifier accuracy can not drop below 0.5.
   
-#### Support for user-specified performance and fairness measures
+##### Support for user-specified performance and fairness measures
 
 As well as providing support for enforcing a wide range of performance and fairness measures, we allow users to define their own metrics and fairness measures.
 
@@ -148,9 +165,9 @@ For example, a custom implementation of recall can be defined as:
 
     my_recall = gm.GroupMetric(lambda TP, FP, FN, TN: (TP) / (TP + FN), 'Recall')
 
-and then the maximum difference in recall between groups (corresponding to the fairness definition of Equal Opportunity) is provided by calling `my_recall.diff`, and the minimum recall over any group (which can be used to ensure that the recall is above a particular value for every group) is given by `my_recall.min`. 
+and then the maximum difference in recall between groups (corresponding to the fairness definition of Equal Opportunity) is provided by calling `my_recall.diff`, and the minimum recall over any group (which can be used to ensure that the recall is above a particular value for every group) is given by `my_recall.min`.
 
-## Altering Behavior
+### Altering Behavior
 
 The behavior of classifiers can be altered through the fit function.
 Given a pretrained binary predictor, we define a fair classifier that will allow us to alter the existing behavior on a validation dataset, by using a labeled attribute 'sex'.
@@ -176,7 +193,7 @@ Note that the default behavior (we should minimize the demographic parity violat
 
 Where constraints cannot be satisfied, for example, if we require that the F1 score must be above 1.1, `fit` returns the solution closest to satisfying it.
 
-## Measuring Behavior
+### Measuring Behavior
 
 A key challenge in deciding how to alter the behavior of classifiers is that these decisions have knock-on effects elsewhere. For example, increasing the precision of classifiers, will often decrease their recall and vice versa.
 
@@ -196,7 +213,7 @@ By default, this method reports the standard fairness metrics of SageMaker Clari
 
 By default, this method reports, per group, the standard binary evaluation criteria of autogluon for both the updated predictor only, over the data used by fit. The behavior can be altered by providing either alternate data or a new dictionary of methods. Where groups is not provided, it will use the same groups as passed to `fit`, but this can be altered. If you wish to also see the per group performance of the original classifier, use `return_original=True` to receive a dict containing the per_group performance of the original and updated classifier. If verbose is set to true, the table contains the long names of methods, otherwise it reports the dictionary keys.
 
-## Fairness using Inferred Attributes
+### Fairness using Inferred Attributes
   
 In many cases, the attribute you wish to be fair with respect to such as `sex` may not be available at test time. In this case you can make use of inferred attributes predicted by another classifier. This can be done by defining the fair predictor in the following way.
 
@@ -213,7 +230,7 @@ To make it easier to use inferred attributes, we provide a helper function:
 
 This allows for the easy training of two tabular classifiers, one called `predictor` to predict the target label `class` without using the attribute `sex` and one called `attribute_pred` to predict `sex` without using the the target label.
 
-## Fairness on COMPAS using Inferred Attributes
+### Fairness on COMPAS using Inferred Attributes
 
 We demonstrate how to enforce a wide range of fairness definitions on the COMPAS dataset. This dataset records paroles caught violating the terms of parole. As it measures who was caught, it is strongly influenced by policing and environmental biases, and should not be confused with a measurement of who actually violated their terms of parole. See [this paper](https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/92cc227532d17e56e07902b254dfad10-Paper-round1.pdf) for a discussion of its limitations and caveats. 
 We use it because it is a standard fairness dataset that captures such strong differences in outcome between people identified as African-American and everyone else, that classifiers trained on this dataset violate most definitions of fairness.
@@ -338,11 +355,11 @@ and
 | Maximal Group Difference in Accuracy            |            0.0147268 |          0.00976726 |              0.672871 |             0.666535 |
 | Treatment Equality                              |            0.32195   |          0.0277123  |              0.672871 |             0.590099 |
 
-## Best Practices
+### Best Practices
 
 It is common for machine learning algorithms to overfit training data. Therefore, if you want your fairness constraints to carry over to unseen data we recommend that they are enforced on a large validation set, rather than the training set. For low-dimensional datasets, Autogluon predictors are robust to overfitting and fairness constraints enforced on training data carry over to unseen test data. In fact, given the choice between enforcing fairness constraints on a large training set, vs. using a significantly smaller validation set, reusing the training set will often result in better generalization of the desired behavior to unseen data. However, this behavior is not guaranteed, and should always be empirically validated.
 
-### Challenges with unbalanced data.
+#### Challenges with unbalanced data.
 
 Many datasets are unbalanced both in the size of protected groups and in the prevalence of positive or negatively labeled data. When a rare group rarely receives positives outcomes, large datasets are needed to correctly estimate the rate of failure per group on positive data. This can make it very hard to reliably enforce or evaluate measures such as equal opportunity or minimum recall on unbalanced datasets, particularly where the baseline classifier has relatively high accuracy. The size and nature of the dataset needs to be carefully considered when choosing a fairness metric.
 
@@ -352,13 +369,13 @@ For this reason, reliably guaranteeing high-accuracy across all groups, or that 
 
 The file `../autogluon/examples/fair/sample_use.ipynb` has an example on the adult dataset where demographic parity is only weakly enforced on test data for the smaller groups `American-Indian-Eskimo`, and `Asian-Pacific-Islander` due to limited sample size.
 
-## List of Measures
+### List of Measures
 
 The remainder of the document lists the standard measures provided by the group_metrics library, which is imported as:
 
     from autogluon.fair.utils import group_metrics as gm
 
-### Basic Structure
+#### Basic Structure
 
 The majority of measures are defined as GroupMetrics or sub-objects of GroupMetrics.
 
@@ -380,21 +397,21 @@ As a convenience, GroupMetrics automatically implements a range of functionality
 
 Having defined a metric as above, we have a range of different objects:
 
- *   `metric.av_diff` reports the average absolute difference of the method between groups.
- *   `metric.average` reports the average of the method taken over all groups.
- *   `metric.diff` reports the maximum difference of the method between any pair of groups.
- *   `metric.max` reports the maximum value for any group.
- *   `metric.min` reports the minimum value for any group.
- *   `metric.overall` reports the overall value for all groups combined, and is the same as calling `metric` directly
- *   `metric.ratio` reports the smallest values for any group divided by the largest
- *   `metric.per_group` reports the value for every group.
+* `metric.av_diff` reports the average absolute difference of the method between groups.
+* `metric.average` reports the average of the method taken over all groups.
+* `metric.diff` reports the maximum difference of the method between any pair of groups.
+* `metric.max` reports the maximum value for any group.
+* `metric.min` reports the minimum value for any group.
+* `metric.overall` reports the overall value for all groups combined, and is the same as calling `metric` directly
+* `metric.ratio` reports the smallest values for any group divided by the largest
+* `metric.per_group` reports the value for every group.
 
 All of these can be passed directly to fit, or to the evaluation functions we provide.
 
 The vast majority of fairness metrics are implemented as a `.diff` of a standard performance measure, and by placing a `.min` after any measure such as `recall` or `precision` it is possible to add constraints that enforce that the precision or recall is above a particular value for every group.
 gm.
 
-### Dataset Measures
+#### Dataset Measures
 
 | Name             | Definition                                                       |
 |------------------|------------------------------------------------------------------|
@@ -404,7 +421,7 @@ gm.
 | `gm.pos_data_rate`  | Ratio of positively labeled points to size of the group         |
 | `gm.neg_data_rate`  | Ratio of negatively labeled points to size of the group         |
 
-### Standard Prediction Measures
+#### Standard Prediction Measures
 
 | Name             | Definition                                                                                                     |
 |------------------|----------------------------------------------------------------------------------------------------------------|
@@ -417,7 +434,7 @@ gm.
 | `gm.pos_pred_val`   | Positive Predicted Value': Ratio of True Positives divided by the total number of points with positive label   |
 | `gm.neg_pred_val`   | Negative Predicted Value': Ratio of True Negatives divided by the total number of points with a negative label |
 
-### Core Performance Measures
+#### Core Performance Measures
 
 | Name                | Definition                                                                                                                                                                               |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -429,7 +446,7 @@ gm.
 | `gm.recall`            | AKA True Positive Prediction Rate                                                                                                                                                        |
 | `gm.mcc`               | Matthews Correlation Coefficient. See https://en.wikipedia.org/wiki/Phi_coefficient                                                                                                      |
 
-### Additional Performance Measures
+#### Additional Performance Measures
 
 | Name              | Definition                                                                        |
 |-------------------|-----------------------------------------------------------------------------------|
@@ -441,7 +458,7 @@ gm.
 | `gm.error_ratio`     | The ratio of False Positives to False Negatives                                    |
 
 
-### Fairness Measures Supported
+#### Fairness Measures Supported
 
 [Sagemaker Clarify](https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-measure-post-training-bias.html) Measures
 
