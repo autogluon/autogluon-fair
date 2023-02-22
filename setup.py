@@ -104,7 +104,7 @@ def default_setup_args(*, version):
 
 version = "0.1"
 version = update_version(version, use_file_if_exists=False, create_file=True)
-AUTOGLUON_VERSION_RANGE = ">=0.6,<1.0"
+AUTOGLUON_VERSION_RANGE = ">=0.7,<1.0"
 
 install_requires = [
     f'{AUTOGLUON}.common{AUTOGLUON_VERSION_RANGE}',
