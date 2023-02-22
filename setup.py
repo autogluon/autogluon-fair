@@ -5,7 +5,7 @@ from setuptools import setup
 AUTOGLUON = "autogluon"
 FAIR = "fair"
 
-PYTHON_REQUIRES = ">=3.7, <3.10"
+PYTHON_REQUIRES = ">=3.8, <3.11"
 
 
 def create_version_file(*, version):
@@ -84,9 +84,9 @@ def default_setup_args(*, version):
             "Operating System :: POSIX",
             "Operating System :: Unix",
             "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
             "Topic :: Software Development",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
             "Topic :: Scientific/Engineering :: Information Analysis",
