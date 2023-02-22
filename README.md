@@ -4,9 +4,7 @@ Autogluon.fair provides additional tools to enforce a wide-range of fairness def
 
 ## Instructions
 
- 1. Install autogluon (see <https://auto.gluon.ai/stable/index.html#installation>)
- 2. Download the source of autogluon.fair and in the source directory run:
-    python3 -m pip install -e .
+ 1. python3 -m pip install "autogluon.fair==0.1.0"
 
 Now run the [Example Notebook](https://github.com/autogluon/autogluon-fair/blob/master/examples/quickstart_fair.ipynb) or try some of the example below.
 
