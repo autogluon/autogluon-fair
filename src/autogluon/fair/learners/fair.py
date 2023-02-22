@@ -225,7 +225,7 @@ class FairPredictor:
                                                                      nr_of_recursive_calls=3,
                                                                      initial_divisions=grid_width)
 
-    def plot_frontier(self, data=None, groups=None, objective1=False, objective2=False) -> None:
+    def plot_frontier(self, data=None, groups=None, objective1=False, objective2=False, show_updated=True, color=None, new_plot=True) -> None:
         """ Plots an existing parato frontier with respect to objective1 and objective2.
             These do not need to be the same objectives as used when computing the frontier
             The original predictor, and the predictor selected by fit is shown in different colors.
@@ -239,13 +239,17 @@ class FairPredictor:
                                     objective provided to fit is used in its place.
             objective2: (optional) an objective to be plotted, if not specified use the
                                     constraint provided to fit is used in its place.
+            show_updated: (optional, default True) Highlight the updated classifier with a different marker
+            color: (optional, default None) Specify the color the frontier should be plotted in. 
+            new_plot: (optional, default True) specifies if plt.figure() should be called at the start or if an existing plot should be overlayed
         """
         if self.frontier is None:
             logger.error('Call fit before plot_frontier')
 
         objective1 = objective1 or self.objective1
         objective2 = objective2 or self.objective2
-        plt.figure()
+        if new_plot:
+            plt.figure()
         plt.title('Frontier found')
         plt.xlabel(objective2.name)
         plt.ylabel(objective1.name)
@@ -306,13 +310,15 @@ class FairPredictor:
             front2_u = efficient_compute.compute_metric(objective2, labels, proba, groups,
                                                         val_thresholds.argmax(1),
                                                         self.offset[:, np.newaxis])
-
-        plt.scatter(front2, front1, label='Frontier')
-        plt.scatter(zero[1], zero[0], label='Original predictor')
-
-        plt.scatter(front2_u, front1_u, label='Updated predictor')
-        plt.legend(loc='best')
-
+        if color is None:
+            plt.scatter(front2, front1, label='Frontier')
+            plt.scatter(zero[1], zero[0],s=40, label='Original predictor',marker='*')
+            if show_updated:
+                plt.scatter(front2_u, front1_u, s=40, label='Updated predictor',marker='P')
+            plt.legend(loc='best')
+        else:
+            plt.scatter(front2, front1, c=color)
+            
     def evaluate(self, data=None, metrics=None, verbose=False) -> pd.DataFrame:
         """Compute standard metrics of the original predictor and the updated predictor
          found by fit and return them in a dataframe.
