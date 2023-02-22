@@ -121,7 +121,7 @@ Of the set of metrics discussed in [Verma and Rubin](https://fairware.cs.umass.e
 
 ##### Direct Remedy of Harms
 
-See summary [article](https://www.wired.com/story/bias-statistics-artificial-intelligence-healthcare/) on the problems this addresses. More details are in the [paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4331652).
+See this [paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4331652) for the problems this addresses.
 
 An Ipython notebook generating many of the figures in the paper can be found here: [Levelling up notebook](https://github.com/autogluon/autogluon-fair/blob/master/examples/levelling_up.ipynb)
 
