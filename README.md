@@ -4,11 +4,18 @@ Autogluon.fair provides additional tools to enforce a wide-range of fairness def
 
 ## Instructions
 
+Try it on [colab](https://colab.research.google.com/drive/1GKzlciJ-Yy3Cej7dJmzK9YS6k12p8fox?usp=sharing).
+
+or install it with the command `pip install autogluon.fair` .
+
+### Source install
+
+To install from source.
  1. Install autogluon (see <https://auto.gluon.ai/stable/index.html#installation>)
  2. Download the source of autogluon.fair and in the source directory run:
     python3 -m pip install -e .
 
-Now run the [Example Notebook](https://github.com/autogluon/autogluon-fair/blob/master/examples/quickstart_fair.ipynb) or try some of the example below.
+Now run the [Example Notebook](examples/quickstart_fair.ipynb) or try some of the example below.
 
 ### Example usage
 
@@ -121,9 +128,9 @@ Of the set of metrics discussed in [Verma and Rubin](https://fairware.cs.umass.e
 
 ##### Direct Remedy of Harms
 
-See summary [article](https://www.wired.com/story/bias-statistics-artificial-intelligence-healthcare/) on the problems this addresses. More details are in the [paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4331652).
+See this [paper](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4331652) for the problems this addresses.
 
-An Ipython notebook generating many of the figures in the paper can be found here: [Levelling up notebook](https://github.com/autogluon/autogluon-fair/blob/master/examples/levelling_up.ipynb)
+An Ipython notebook generating many of the figures in the paper can be found here: [Levelling up notebook](examples/levelling_up.ipynb)
 
 Many fairness measures can be understood as identifying a harm, and then equalizing this harm across the population as a whole. For example, the use demographic parity of identifies people as being harmed by a low selection rate, which is then set to be the same for all groups, while equal opportunity identifies people as being harmed by low recall, and balances this harm across all groups. However, these fairness formulations often explicitly  
 
