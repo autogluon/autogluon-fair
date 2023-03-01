@@ -83,7 +83,7 @@ class FairPredictor:
 
         # We use _internal_groups as a standardized argument that is always safe to pass
         # to functions expecting a vector
-        self._internal_groups = self.groups_to_numpy(groups, validation_data)
+        self._internal_groups = self.groups_to_numpy(groups, self.validation_data)
 
         if self._internal_groups.shape[0] != validation_labels.shape[0]:
             logger.error('The size of the groups does not match the dataset size')
@@ -346,7 +346,6 @@ class FairPredictor:
             plt.legend(loc='best')
         else:
             plt.scatter(front2, front1, c=color)
-        plt.show()
             
     def evaluate(self, data=None, metrics=None, verbose=False) -> pd.DataFrame:
         """Compute standard metrics of the original predictor and the updated predictor
