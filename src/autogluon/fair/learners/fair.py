@@ -27,6 +27,11 @@ class FairPredictor:
         2. a vector of the same size as the validation set containing discrete values
         3. The value None   (used when we don't require groups, for example,
                if we are optimizing F1 without per-group thresholds)
+    as_oof : bool, default = False
+        If True, `validation_data` should be the original training data used to fit `predictor`.
+        If False, `validation_data` should be holdout data that was not used during the fit call of `predictor`, or was specified as `tuning_data`.
+        When True, this allows the predictor to directly fetch the proper prediction probabilities using out-of-fold predictions.
+        This is optimal, and should always be set to True unless the user is providing new unseen data to `validation_data`.
     inferred_groups: (Optional, default False) A binary or multiclass autogluon predictor that infers the protected
                                 attributes.
         This can be used to enforce fairness when no information about protected attribtutes is
@@ -38,9 +43,14 @@ class FairPredictor:
     If use_fast is False, autogluon scorers are also supported.
     """
 
-    def __init__(self, predictor, validation_data, groups=None, *, inferred_groups=False,
-                 use_fast=True) -> None:
-
+    def __init__(self,
+                 predictor,
+                 validation_data,
+                 groups=None,
+                 *,
+                 as_oof: bool = False,
+                 inferred_groups=False,
+                 use_fast=True):
         if predictor.problem_type != 'binary':
             logger.error('Fairpredictor only takes a binary predictor as input')
         self.predictor = predictor
@@ -52,18 +62,37 @@ class FairPredictor:
         # However, as a user interface groups = None makes more sense for instantiation.
         self.groups = groups
         self.use_fast: bool = use_fast
-        self.validation_data = validation_data
+
+        # TODO: Next step to make this easier is to cache original train data during TabularPredictor.fit
+        #  so we can load it here without the user needing to even pass validation_data at all.
+        #  This would maximize ease of use.
+        #  This requires adding new logic to TabularPredictor.
+        if as_oof:
+            model_best = predictor.get_model_best()
+            y_pred_proba = predictor.predict_proba_multi(inverse_transform=True, models=[model_best])[model_best]
+            val_data_source = 'val' if predictor._trainer.has_val else 'train'
+            _, y_val = predictor.load_data_internal(data=val_data_source, return_X=False, return_y=True)
+            self.validation_data = validation_data.loc[y_val.index]  # FIXME: Store true data directly in predictor
+        else:
+            self.validation_data = validation_data
+            y_pred_proba = predictor.predict_proba(self.validation_data)
+
         validation_labels = self.validation_data[predictor.label]
+
+        self.proba = np.asarray(y_pred_proba)
 
         # We use _internal_groups as a standardized argument that is always safe to pass
         # to functions expecting a vector
-        self._internal_groups = self.groups_to_numpy(groups, validation_data)
+        self._internal_groups = self.groups_to_numpy(groups, self.validation_data)
 
         if self._internal_groups.shape[0] != validation_labels.shape[0]:
             logger.error('The size of the groups does not match the dataset size')
 
         self.inferred_groups: bool = inferred_groups
         if inferred_groups:
+            # FIXME: Not implemented correctly when `as_oof=True`
+            if as_oof:
+                raise NotImplementedError('inferred_groups not implemented when as_oof=True')
             self._val_thresholds = np.asarray(inferred_groups.predict_proba(self.validation_data))
         else:
             # Use OneHot and store encoder so it will work on new data
@@ -72,7 +101,6 @@ class FairPredictor:
             self._val_thresholds = self.group_encoder.transform(
                 self._internal_groups.reshape(-1, 1)).toarray()
 
-        self.proba = np.asarray(predictor.predict_proba(self.validation_data))
         self.y_true = np.asarray(validation_labels == self.predictor.class_labels[1])
         self.frontier = None
         if self.use_fast:
