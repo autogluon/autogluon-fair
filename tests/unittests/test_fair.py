@@ -178,6 +178,11 @@ def min_recall(predictor, new_test, use_fast):
     fpredictor.fit(gm.accuracy, gm.recall.min, 0.5)
     scores = fpredictor.evaluate_groups()
     assert all(scores['recall'][:-1] > 0.5)
+    #Check that all predictions are non-negative
+    proba = np.asarray(fpredictor.predict_proba(new_test))
+    assert (proba>=0).all()
+    assert (np.asarray(proba).sum(1)<1.001).all()
+    assert (np.asarray(proba).sum(1)>0.99).all()
 
 
 def test_recall_diff_inferred():
