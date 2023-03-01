@@ -523,8 +523,11 @@ class FairPredictor:
         data a pandas array to make predictions over.
         return
         ------
-        a  pandas array of scores. Note, these scores are not probabilities, and not guarenteed to
-        be non-negative or to sum to 1.
+        a  pandas array of scores. 
+        
+        
+        Note, these scores are not probabilities, and should not be interpreted as such.
+        To preserve existing workflows they are guarenteed to be non-negative and to sum to 1.
         """
         proba: pd.DataFrame = self.predictor.predict_proba(data,
                                                            transform_features=transform_features)
@@ -540,11 +543,17 @@ class FairPredictor:
         if self.use_fast:
             tmp = np.zeros_like(proba)
             tmp[:, 1] = self.offset[onehot.argmax(1)]
+            tmp -= tmp.min(1)[:,np.newaxis]
+            # if offsets are negative, set offset to zero and increasing other offset
         else:
-            tmp = onehot.dot(self.offset)
+            offset=self.offset-self.offset.min(1)[:,np.newaxis]
+            # if offsets are negative, set offset to zero and increasing other offset
+            tmp = onehot.dot(offset)
+            
         if self.round is not False:
             proba = np.around(proba / self.round) * self.round
         proba += tmp
+        proba /= proba.sum(1)[:,np.newaxis] # Map into probability simplex
         return proba
 
     def predict(self, data, *, transform_features=True) -> pd.Series:
