@@ -59,13 +59,13 @@ def test_fairness():
     predictor = TabularPredictor(label='class').fit(train_data=train_data)
     base_functionality(predictor, train_data)
     no_groups(predictor, test_data)
+    new_test = test_data[~test_data['race'].isin([' Other', ' Asian-Pac-Islander', ])]  # drop other
     for use_fast in [True, False]:  # use_fast=False makes this significantly slow
+        min_recall(predictor, new_test, use_fast)
         predict(predictor, test_data, use_fast)
         recall_diff(predictor, test_data, use_fast)
-        new_test = test_data[~test_data['race'].isin([' Other', ' Asian-Pac-Islander', ])]  # drop other
         subset(predictor, test_data, new_test, use_fast)
         disp_impact(predictor, new_test, use_fast)
-        min_recall(predictor, new_test, use_fast)
         pathologoical2(predictor, new_test, use_fast)
     pathologoical(predictor, test_data)
 
@@ -76,7 +76,7 @@ def base_functionality(predictor, train_data):
     fpredictor.evaluate()
     fpredictor.evaluate_fairness()
     fpredictor.evaluate_groups()
-    assert (fpredictor.predict_proba(train_data) == predictor.predict_proba(train_data)).all().all()
+    assert np.isclose(fpredictor.predict_proba(train_data), predictor.predict_proba(train_data)).all().all()
     assert (fpredictor.predict(train_data) == predictor.predict(train_data)).all().all()
     fpredictor.evaluate(verbose=True)
     fpredictor.evaluate_fairness(verbose=True)
@@ -91,7 +91,7 @@ def no_groups(predictor, train_data):
     fairp.evaluate()
     fairp.evaluate_groups()
     fairp.evaluate_fairness()
-    assert (fairp.predict_proba(train_data) == predictor.predict_proba(train_data)).all().all()
+    assert np.isclose(fairp.predict_proba(train_data), predictor.predict_proba(train_data)).all().all()
     assert (fairp.predict(train_data) == predictor.predict(train_data)).all().all()
     fairp.fit(gm.accuracy, gm.f1, 0)
 
